@@ -10,7 +10,8 @@ import (
 
 // CustomClaims defines JWT claims with permissions
 type CustomClaims struct {
-	PermCodes []string `json:"perm_codes"`
+	PermCodes      []string `json:"perm_codes"`
+	EmployeeStatus string   `json:"employee_status"`
 	jwt.RegisteredClaims
 }
 
@@ -48,6 +49,27 @@ func AuthMiddleware(requiredPerms []string, next http.Handler) http.Handler {
 				http.Error(w, "#3 AuthMiddleware: Forbidden", http.StatusForbidden)
 				return
 			}
+		}
+		next.ServeHTTP(w, r)
+	})
+}
+
+func EmployeeStatusMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		authHeader := r.Header.Get("Authorization")
+		if !strings.HasPrefix(authHeader, "Bearer ") {
+			http.Error(w, "#1 EmployeeStatusMiddleware: Unauthorized", http.StatusUnauthorized)
+			return
+		}
+		token := strings.TrimPrefix(authHeader, "Bearer ")
+		claims, err := ValidateToken(token)
+		if err != nil {
+			http.Error(w, "#2 EmployeeStatusMiddleware: Invalid token", http.StatusUnauthorized)
+			return
+		}
+		if claims.EmployeeStatus == "STATUS_INACTIVE" {
+			http.Error(w, "#3 EmployeeStatusMiddleware: Employee inactive", http.StatusForbidden)
+			return
 		}
 		next.ServeHTTP(w, r)
 	})
