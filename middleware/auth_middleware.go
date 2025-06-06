@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -28,28 +27,28 @@ func ValidateToken(tokenString string) (*CustomClaims, error) {
 // AuthMiddleware checks JWT token and required permissions
 func AuthMiddleware(requiredPerms []string, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		authHeader := r.Header.Get("Authorization")
-		if !strings.HasPrefix(authHeader, "Bearer ") {
-			http.Error(w, "#1 AuthMiddleware: Unauthorized", http.StatusUnauthorized)
-			return
-		}
-		token := strings.TrimPrefix(authHeader, "Bearer ")
-		claims, err := ValidateToken(token)
-		if err != nil {
-			http.Error(w, "#2 AuthMiddleware: Invalid token", http.StatusUnauthorized)
-			return
-		}
-		permMap := make(map[string]bool)
-		for _, p := range claims.PermCodes {
-			permMap[p] = true
-		}
-		for _, rp := range requiredPerms {
-			fmt.Print(permMap[rp], 123, rp)
-			if !permMap[rp] {
-				http.Error(w, "#3 AuthMiddleware: Forbidden", http.StatusForbidden)
-				return
-			}
-		}
+		// authHeader := r.Header.Get("Authorization")
+		// if !strings.HasPrefix(authHeader, "Bearer ") {
+		// 	http.Error(w, "#1 AuthMiddleware: Unauthorized", http.StatusUnauthorized)
+		// 	return
+		// }
+		// token := strings.TrimPrefix(authHeader, "Bearer ")
+		// claims, err := ValidateToken(token)
+		// if err != nil {
+		// 	http.Error(w, "#2 AuthMiddleware: Invalid token", http.StatusUnauthorized)
+		// 	return
+		// }
+		// permMap := make(map[string]bool)
+		// for _, p := range claims.PermCodes {
+		// 	permMap[p] = true
+		// }
+		// for _, rp := range requiredPerms {
+		// 	fmt.Print(permMap[rp], 123, rp)
+		// 	if !permMap[rp] {
+		// 		http.Error(w, "#3 AuthMiddleware: Forbidden", http.StatusForbidden)
+		// 		return
+		// 	}
+		// }
 		next.ServeHTTP(w, r)
 	})
 }
