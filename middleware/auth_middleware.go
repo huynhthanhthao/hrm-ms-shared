@@ -66,8 +66,8 @@ func EmployeeStatusMiddleware(next http.Handler) http.Handler {
 			http.Error(w, "#2 EmployeeStatusMiddleware: Invalid token", http.StatusUnauthorized)
 			return
 		}
-		if claims.EmployeeStatus == "STATUS_INACTIVE" {
-			http.Error(w, "#3 EmployeeStatusMiddleware: Employee inactive", http.StatusForbidden)
+		if claims.EmployeeStatus != "active" {
+			http.Error(w, "#3 EmployeeStatusMiddleware: Employee not active", http.StatusForbidden)
 			return
 		}
 		next.ServeHTTP(w, r)
