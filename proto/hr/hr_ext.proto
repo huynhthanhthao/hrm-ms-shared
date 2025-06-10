@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package hr_proto;
+
+option go_package = "proto/hr";
+
+import "proto/hr/hr.proto";
+
+import "google/protobuf/empty.proto";
+
+message GetEmployeeByUserIdRequest {
+  string user_id = 1;
+}
+
+message DeleteEmployeeByUserIdRequest {
+  string user_id = 1;
+}
+
+service ExtService {
+  rpc GetEmployeeByUserId (GetEmployeeByUserIdRequest) returns (Employee);
+  
+  rpc DeleteEmployeeByUserId (DeleteEmployeeByUserIdRequest) returns (google.protobuf.Empty);
+}
